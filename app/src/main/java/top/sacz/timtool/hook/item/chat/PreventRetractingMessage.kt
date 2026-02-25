@@ -6,12 +6,12 @@ import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.widget.TextView
 import com.alibaba.fastjson2.TypeReference
+import top.artmoe.inao.item.NewPreventRetractingMessageCore
 import top.sacz.timtool.R
 import top.sacz.timtool.hook.base.BaseSwitchFunctionHookItem
 import top.sacz.timtool.hook.core.annotation.HookItem
 import top.sacz.timtool.hook.item.api.QQMessageViewListener
 import top.sacz.timtool.hook.item.api.QQMsgViewAdapter
-import top.sacz.timtool.hook.item.chat.retracting.PreventRetractingMessageCore
 import top.sacz.xphelper.reflect.ClassUtils
 import top.sacz.xphelper.reflect.ConstructorUtils
 import top.sacz.xphelper.reflect.FieldUtils
@@ -39,9 +39,13 @@ class PreventRetractingMessage : BaseSwitchFunctionHookItem() {
             val cmd = param.args[0] as String
             val protoBuf = param.args[1] as ByteArray
             if (cmd == "trpc.msg.register_proxy.RegisterProxy.InfoSyncPush") {
-                PreventRetractingMessageCore.handleInfoSyncPush(protoBuf, param)
+                NewPreventRetractingMessageCore.handleInfoSyncPush(protoBuf, param) { isTroop, peerId, msgSeq ->
+                    writeAndRefresh(peerId, msgSeq)
+                }
             } else if (cmd == "trpc.msg.olpush.OlPushService.MsgPush") {
-                PreventRetractingMessageCore.handleMsgPush(protoBuf, param)
+                NewPreventRetractingMessageCore.handleMsgPush(protoBuf, param) { isTroop, peerId, msgSeq ->
+                    writeAndRefresh(peerId, msgSeq)
+                }
             }
         }
         hookAIOMsgUpdate()
