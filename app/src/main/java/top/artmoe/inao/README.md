@@ -120,6 +120,9 @@ object PreventRetractingMessageCore {
             }
             syncInfoBody.copy(msgList = newMsgList)
         }
+        if (recallMsgSeqList.isEmpty()) {
+            return
+        }
         val newInfoSyncPush = infoSyncPush.copy(
             syncRecallContent = infoSyncPush.syncRecallContent.copy(
                 syncInfoBody = newSyncInfoBody
