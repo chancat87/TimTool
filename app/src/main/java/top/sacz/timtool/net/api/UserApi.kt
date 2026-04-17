@@ -5,8 +5,8 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
 import top.sacz.timtool.net.entity.QSResult
+import top.sacz.timtool.net.entity.TokenInfo
 import top.sacz.timtool.net.entity.User
-import top.sacz.timtool.net.httpconfig.TokenInfo
 
 /**
  * 在宿主环境 不能使用suspend搭配协程

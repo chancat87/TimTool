@@ -5,8 +5,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.widget.TextView
-import com.alibaba.fastjson2.TypeReference
+import top.artmoe.inao.item.FriendChatMessageRecall
+import top.artmoe.inao.item.GroupChatMessageRecall
 import top.artmoe.inao.item.NewPreventRetractingMessageCore
+import top.artmoe.inao.item.RetractingCallback
 import top.sacz.timtool.R
 import top.sacz.timtool.hook.base.BaseSwitchFunctionHookItem
 import top.sacz.timtool.hook.core.annotation.HookItem
@@ -22,9 +24,46 @@ import top.sacz.xphelper.util.ConfigUtils
 class PreventRetractingMessage : BaseSwitchFunctionHookItem() {
 
     private val viewId = 0x298382
-    private var retractMessageMap: MutableMap<String, MutableList<Int>> = HashMap()
+    private val config = ConfigUtils("防撤回")
+
+    //使用map来拼接key查，性能通常比list更快
+    private val friendChatMap = mutableMapOf<String, FriendChatMessageRecall>()
+    private val groupChatMap = mutableMapOf<String, GroupChatMessageRecall>()
+
+    private val friendChatList = mutableListOf<FriendChatMessageRecall>()
+    private val groupChatList = mutableListOf<GroupChatMessageRecall>()
+
+    /**
+     * 缓存到本地
+     */
+    private fun readLocalCache() {
+        val friendCache = config.getList("friendCache", FriendChatMessageRecall::class.java)
+        friendChatList.addAll(friendCache)
+        val groupCache = config.getList("groupCache", GroupChatMessageRecall::class.java)
+        groupChatList.addAll(groupCache)
+        //然后生成缓存到map
+        for (friend in friendChatList) {
+            friendChatMap[friend.peerUid + friend.msgSeq.toString()] = friend
+        }
+        for (group in groupChatList) {
+            groupChatMap[group.groupUin + group.msgSeq.toString()] = group
+        }
+    }
+
+    private fun addToFriendChatList(data: FriendChatMessageRecall) {
+        friendChatList.add(data)
+        friendChatMap[data.peerUid + data.msgSeq.toString()] = data
+        config.put("friendCache", friendChatList)
+    }
+
+    private fun addToGroupChatList(data: GroupChatMessageRecall) {
+        groupChatList.add(data)
+        groupChatMap[data.groupUin + data.msgSeq.toString()] = data
+        config.put("groupCache", groupChatList)
+    }
+
     override fun loadHook(loader: ClassLoader) {
-        readData()
+        readLocalCache()
 
         val onMSFPushMethod = MethodUtils.create("com.tencent.qqnt.kernel.nativeinterface.IQQNTWrapperSession\$CppProxy")
             .params(
@@ -34,26 +73,27 @@ class PreventRetractingMessage : BaseSwitchFunctionHookItem() {
             )
             .methodName("onMsfPush")
             .first()
+        NewPreventRetractingMessageCore.setOnRecallMessageDetected(object : RetractingCallback {
+            override fun onFriendChatMessageRecall(data: FriendChatMessageRecall) {
+                addToFriendChatList(data)
+            }
 
+            override fun onGroupChatMessageRecall(data: GroupChatMessageRecall) {
+                addToGroupChatList(data)
+            }
+        })
         hookBefore(onMSFPushMethod) { param ->
             val cmd = param.args[0] as String
             val protoBuf = param.args[1] as ByteArray
             if (cmd == "trpc.msg.register_proxy.RegisterProxy.InfoSyncPush") {
-                NewPreventRetractingMessageCore.handleInfoSyncPush(protoBuf, param) { isTroop, peerId, msgSeq ->
-                    writeAndRefresh(peerId, msgSeq)
-                }
+                NewPreventRetractingMessageCore.handleInfoSyncPush(protoBuf, param)
             } else if (cmd == "trpc.msg.olpush.OlPushService.MsgPush") {
-                NewPreventRetractingMessageCore.handleMsgPush(protoBuf, param) { isTroop, peerId, msgSeq ->
-                    writeAndRefresh(peerId, msgSeq)
-                }
+                NewPreventRetractingMessageCore.handleMsgPush(protoBuf, param)
             }
         }
         hookAIOMsgUpdate()
     }
 
-    private fun getConfigUtils(): ConfigUtils {
-        return ConfigUtils("防撤回数据库")
-    }
 
     private fun hookAIOMsgUpdate() {
         QQMessageViewListener.addMessageViewUpdateListener(
@@ -135,35 +175,10 @@ class PreventRetractingMessage : BaseSwitchFunctionHookItem() {
     /**
      * 是否撤回的消息
      */
-    private fun isRetractMessage(peerUid: String?, msgSeq: Int): Boolean {
-        val seqList = retractMessageMap[peerUid] ?: return false
-        return seqList.contains(msgSeq)
+    private fun isRetractMessage(peerUid: String, msgSeq: Int): Boolean {
+        val key = peerUid + msgSeq.toString()
+        return friendChatMap.containsKey(key) || groupChatMap.containsKey(key)
     }
 
-    /**
-     * 写入本地撤回记录
-     */
-    fun writeAndRefresh(peerUid: String, msgSeq: Int) {
-        var seqList: MutableList<Int>? = retractMessageMap[peerUid]
-        if (seqList == null) {
-            seqList = ArrayList()
-        }
-        //往该set添加seq
-        seqList.add(msgSeq)
-        //刷新map
-        retractMessageMap[peerUid] = seqList
-        getConfigUtils().put("retractMessageMap", retractMessageMap)
-    }
 
-    /**
-     * 从本地读取撤回记录数据
-     */
-    private fun readData() {
-        val type = object : TypeReference<MutableMap<String, MutableList<Int>>>() {}
-        var localRetractMessageMap = getConfigUtils().getObject("retractMessageMap", type)
-        if (localRetractMessageMap == null) {
-            localRetractMessageMap = HashMap()
-        }
-        this.retractMessageMap = localRetractMessageMap
-    }
 }

@@ -1,7 +1,6 @@
 package top.sacz.timtool.hook.item.qzone
 
 import android.view.View
-import com.alibaba.fastjson2.TypeReference
 import top.sacz.timtool.hook.base.BaseSwitchFunctionHookItem
 import top.sacz.timtool.hook.core.annotation.HookItem
 import top.sacz.timtool.hook.util.OutputHookStack
@@ -43,10 +42,7 @@ class AutoLikeQZone : BaseSwitchFunctionHookItem() {
                 //存储已经处理过的标识
                 val integerUniTimeLbsKey = feedData.getFieldValue<Int>("integerUniTimeLbsKey")
                 //获取Set
-                var noLikeSet = noLikeConfig.getObject("noLikeSet", object : TypeReference<MutableSet<Int>>() {})
-                if (noLikeSet == null) {
-                    noLikeSet = mutableSetOf()
-                }
+                val noLikeSet = noLikeConfig.getList<Int>("noLikeSet")
                 //已经点赞则不处理
                 if (isLiked) {
                     noLikeSet.add(integerUniTimeLbsKey)

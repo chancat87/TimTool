@@ -8,6 +8,7 @@ import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 import top.sacz.timtool.net.HttpClient;
+import top.sacz.timtool.net.entity.TokenInfo;
 
 
 public class TokenHeader implements Interceptor {

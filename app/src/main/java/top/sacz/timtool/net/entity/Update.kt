@@ -2,6 +2,7 @@ package top.sacz.timtool.net.entity
 
 import java.time.LocalDateTime
 
+
 data class HasUpdate(
     val hasUpdate: Boolean,
     val isForceUpdate: Boolean,

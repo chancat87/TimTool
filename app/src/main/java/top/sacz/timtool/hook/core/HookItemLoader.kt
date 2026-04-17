@@ -1,6 +1,5 @@
 package top.sacz.timtool.hook.core
 
-import com.alibaba.fastjson2.TypeReference
 import top.sacz.timtool.hook.base.BaseSwitchFunctionHookItem
 import top.sacz.timtool.hook.core.factory.HookItemFactory
 import top.sacz.xphelper.util.ConfigUtils
@@ -13,8 +12,7 @@ class HookItemLoader {
      */
     fun loadConfig() {
         //读取配置 如果不存在则new一个
-        val type = object : TypeReference<HashMap<String, Boolean>>() {}
-        var config: Map<String, Boolean>? = ConfigUtils("item_config").getObject("item_config", type)
+        var config: Map<String, Boolean>? = ConfigUtils("item_config").getObject<Map<String, Boolean>>("item_config")
         if (config == null) {
             config = HashMap()
         }

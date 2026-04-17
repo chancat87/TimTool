@@ -4,10 +4,12 @@ import androidx.annotation.NonNull;
 
 import com.alibaba.fastjson2.JSON;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class User implements Serializable {
+import kotlinx.serialization.Serializable;
+
+@Serializable
+public class User {
 
     private String uin;
 

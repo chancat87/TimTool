@@ -1,17 +1,16 @@
 package top.sacz.timtool.net;
 
 
-
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import top.sacz.timtool.net.api.PayApi;
 import top.sacz.timtool.net.api.UpdateApi;
 import top.sacz.timtool.net.api.UserApi;
+import top.sacz.timtool.net.entity.TokenInfo;
 import top.sacz.timtool.net.httpconfig.AesEncryptInterceptor;
 import top.sacz.timtool.net.httpconfig.FastJsonConverterFactory;
 import top.sacz.timtool.net.httpconfig.LogInterceptor;
 import top.sacz.timtool.net.httpconfig.TokenHeader;
-import top.sacz.timtool.net.httpconfig.TokenInfo;
 
 
 /**

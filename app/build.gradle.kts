@@ -1,11 +1,10 @@
-import com.google.protobuf.gradle.proto
 import top.sacz.buildplugin.BuildVersionConfig
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.protobuf)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 android {
@@ -17,8 +16,8 @@ android {
         applicationId = BuildVersionConfig.applicationId
         minSdk = BuildVersionConfig.minSdk
         targetSdk = BuildVersionConfig.targetSdk
-        versionCode = 30
-        versionName = "3.0"
+        versionCode = 31
+        versionName = "3.1"
 
         ndk {
             //只支持arm64 v8a的lib so库,因为qq只支持arm64 v8a
@@ -72,15 +71,6 @@ android {
 
     buildFeatures {
         buildConfig = true
-    }
-
-    sourceSets {
-        getByName("main") {
-
-            proto {
-                srcDirs("src/main/proto")
-            }
-        }
     }
 }
 
@@ -144,19 +134,4 @@ dependencies {
     implementation(libs.kotlinx.serialization.protobuf)
     implementation(libs.protobuf.java)
 
-}
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:3.25.3"
-    }
-
-    generateProtoTasks {
-        all().forEach { task ->
-            task.builtins {
-                create("java") {
-                    option("lite")
-                }
-            }
-        }
-    }
 }

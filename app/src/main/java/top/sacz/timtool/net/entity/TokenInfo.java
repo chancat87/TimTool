@@ -1,8 +1,10 @@
-package top.sacz.timtool.net.httpconfig;
+package top.sacz.timtool.net.entity;
 
-import java.io.Serializable;
 
-public class TokenInfo implements Serializable {
+import kotlinx.serialization.Serializable;
+
+@Serializable
+public class TokenInfo {
 
     public String tokenName;
     public String tokenValue;
