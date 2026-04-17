@@ -5,6 +5,11 @@ import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
 @Serializable
+data class RequestLogin(
+    @SerialName("uin") val uin: String,
+)
+
+@Serializable
 data class User(
     /** QQ */
     @SerialName("uin") val uin: String = "",
