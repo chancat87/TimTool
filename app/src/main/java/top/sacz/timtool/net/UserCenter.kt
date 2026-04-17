@@ -12,12 +12,12 @@ object UserCenter {
     }
 
     fun getUserInfo(): User {
-        val user = User()
-        user.uin = "0"
-        user.nickname = "未同步"
-        user.identity = 0
-        user.identityName = "未同步"
-        return getConfig().getObject("user_info", User::class.java) ?: user
+        val defaultUser = User(uin = "0", nickname = "未同步", identityName = "未同步")
+        return try {
+            getConfig().getObject("user_info", User::class.java) ?: defaultUser
+        } catch (e: Exception) {
+            defaultUser
+        }
     }
 
     fun setUpdateToken(token: TokenInfo) {
@@ -29,7 +29,11 @@ object UserCenter {
     }
 
     fun getTokenInfo(): TokenInfo? {
-        return getConfig().getObject("token", TokenInfo::class.java)
+        return try {
+            getConfig().getObject("token", TokenInfo::class.java)
+        } catch (e: Exception) {
+            null
+        }
     }
 
     private fun getConfig() = ConfigUtils("user")

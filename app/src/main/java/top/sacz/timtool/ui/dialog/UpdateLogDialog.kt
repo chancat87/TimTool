@@ -1,12 +1,11 @@
 package top.sacz.timtool.ui.dialog
 
 import com.kongzue.dialogx.dialogs.MessageDialog
+import com.kongzue.dialogx.dialogs.PopTip
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import top.sacz.timtool.R
-import top.sacz.timtool.hook.util.LogUtils
-import top.sacz.timtool.hook.util.ToastTool
 import top.sacz.timtool.net.HttpClient
 import top.sacz.timtool.net.entity.QSResult
 import top.sacz.timtool.net.entity.UpdateInfo
@@ -42,7 +41,7 @@ class UpdateLogDialog {
     }
 
     fun asyncGetUpdateLog(dialog: MessageDialog) {
-        val updateApi = HttpClient.getUpdateApi()
+        val updateApi = HttpClient.updateApi
         updateApi.getUpdateLog(0).enqueue(object : Callback<QSResult<List<UpdateInfo>>> {
             override fun onResponse(
                 call: Call<QSResult<List<UpdateInfo>>?>,
@@ -57,7 +56,7 @@ class UpdateLogDialog {
                 p1: Throwable
             ) {
                 Log.e("update-log-dialog", p1)
-                ToastTool.show(p1.message!!)
+                PopTip.show("获取更新日志失败: ${p1.message ?: "网络错误"}")
             }
         })
     }

@@ -1,8 +1,9 @@
 package top.sacz.timtool.ui.dialog
 
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import com.kongzue.dialogx.dialogs.MessageDialog
+import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.dialogs.TipDialog
 import com.kongzue.dialogx.dialogs.WaitDialog
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -27,7 +28,7 @@ import top.sacz.xphelper.util.ActivityTools
  */
 class PayDialog(val settingDialog: SettingDialog) {
 
-    private val payApi = HttpClient.getPayApi()
+    private val payApi = HttpClient.payApi
 
     private val uin = QQEnvTool.getCurrentUin()
 
@@ -52,12 +53,17 @@ class PayDialog(val settingDialog: SettingDialog) {
         payApi.createAfdianOrder(uin).enqueue(object : retrofit2.Callback<QSResult<String>> {
             override fun onResponse(p0: Call<QSResult<String>>, p1: Response<QSResult<String>>) {
                 WaitDialog.dismiss()
-                showPayDialog(p1.body()!!.data)
+                val data = p1.body()?.data
+                if (data != null) {
+                    showPayDialog(data)
+                } else {
+                    PopTip.show("创建订单失败，服务器无响应")
+                }
             }
 
             override fun onFailure(p0: Call<QSResult<String>>, p1: Throwable) {
                 WaitDialog.dismiss()
-                ToastTool.show("创建订单失败:$p1")
+                PopTip.show("创建订单失败: ${p1.message}")
             }
         })
     }
@@ -71,7 +77,7 @@ class PayDialog(val settingDialog: SettingDialog) {
             }.setCancelButton("主动跳转到浏览器") { _, _ ->
                 val intent = Intent(Intent.ACTION_VIEW)
                 intent.addCategory(Intent.CATEGORY_BROWSABLE)
-                intent.setData(Uri.parse(payUrl))
+                intent.setData(payUrl.toUri())
                 ActivityTools.getTopActivity().startActivity(intent)
                 true
             }
@@ -79,7 +85,7 @@ class PayDialog(val settingDialog: SettingDialog) {
             delay(2000)
             val intent = Intent(Intent.ACTION_VIEW)
             intent.addCategory(Intent.CATEGORY_BROWSABLE)
-            intent.setData(Uri.parse(payUrl))
+            intent.setData(payUrl.toUri())
             ActivityTools.getTopActivity().startActivity(intent)
         }
     }
@@ -90,7 +96,7 @@ class PayDialog(val settingDialog: SettingDialog) {
         //循环5次
         for (i in 0..5) {
             val result = payApi.queryOrderResult(uin).execute().body() ?: return@launch
-            if (result.isSuccess) {
+            if (result.isSuccess()) {
                 ToastTool.show(result.msg)
                 doPaySuccess()
                 return@launch
@@ -106,10 +112,17 @@ class PayDialog(val settingDialog: SettingDialog) {
     @OptIn(DelicateCoroutinesApi::class)
     private fun doPaySuccess() = GlobalScope.launch(Dispatchers.IO) {
         WaitDialog.show("赞助成功 正在为您刷新用户信息")
-        NewLoginTask().awaitLogin()
-        TipDialog.show("用户信息更新成功", WaitDialog.TYPE.SUCCESS)
-        withContext(Dispatchers.Main) {
-            settingDialog.refresh()
+        try {
+            NewLoginTask().awaitLogin()
+            TipDialog.show("用户信息更新成功", WaitDialog.TYPE.SUCCESS)
+            withContext(Dispatchers.Main) {
+                settingDialog.refresh()
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                WaitDialog.dismiss()
+                PopTip.show("刷新用户信息失败: ${e.message}")
+            }
         }
     }
 }

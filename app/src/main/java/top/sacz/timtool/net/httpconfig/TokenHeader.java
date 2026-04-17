@@ -19,11 +19,9 @@ public class TokenHeader implements Interceptor {
         Request.Builder builder = request.newBuilder();
         TokenInfo tokenInfo = HttpClient.getTokenInfo();
         if (tokenInfo != null) {
-            String tokenName = tokenInfo.tokenName;
-            String tokenValue = tokenInfo.tokenValue;
-            if (tokenName != null && tokenValue != null) {
-                builder.header(tokenName, tokenValue);
-            }
+            String tokenName = tokenInfo.getTokenName();
+            String tokenValue = tokenInfo.getTokenValue();
+            builder.header(tokenName, tokenValue);
         }
         request = builder.build();
         return chain.proceed(request);

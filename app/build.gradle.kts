@@ -117,6 +117,7 @@ dependencies {
     //常用
     implementation(libs.okhttp3)
     implementation(libs.retrofit2)
+    implementation(libs.retrofit2.kotlinx.serialization)
     implementation(libs.glide)
     implementation(libs.fastkv)
     implementation(libs.fastjson2)

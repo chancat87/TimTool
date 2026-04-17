@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kongzue.dialogx.dialogs.MessageDialog
+import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.interfaces.OnBindView
 import com.kongzue.dialogx.util.FixContextUtil
 import top.sacz.timtool.BuildConfig
@@ -94,7 +95,12 @@ class SettingDialog {
 
     @SuppressLint("InflateParams")
     private fun onBindView() {
-        val userInfo = UserCenter.getUserInfo()
+        val userInfo = try {
+            UserCenter.getUserInfo()
+        } catch (e: Exception) {
+            PopTip.show("读取用户信息失败")
+            return
+        }
 
         val context = rootView.context
         val ibViewAllUpdateLog = rootView.findViewById<View>(R.id.ib_update_log)

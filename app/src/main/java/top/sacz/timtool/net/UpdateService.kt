@@ -2,7 +2,7 @@ package top.sacz.timtool.net
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import com.kongzue.dialogx.dialogs.MessageDialog
 import com.kongzue.dialogx.dialogs.PopTip
 import de.robv.android.xposed.XC_MethodHook
@@ -86,7 +86,7 @@ class UpdateService {
             LogUtils.addError("update-service", e)
         }) {
 
-            val api = HttpClient.getUpdateApi()
+            val api = HttpClient.updateApi
             api.hasUpdate(version)
                 .execute().body()?.let { qsResult ->
                     hasUpdate = qsResult.data
@@ -118,7 +118,7 @@ class UpdateService {
         //有强制更新
         if (isForceUpdate()) {
             //设置弹窗不可取消
-            dialog.setCancelable(false)
+            dialog.isCancelable = false
             dialog.setCancelButton(R.string.is_force_update) { _, _ ->
                 toUpdate(getDownloadUrl())
                 true
@@ -130,7 +130,7 @@ class UpdateService {
         val activity = ActivityTools.getTopActivity()
         val intent = Intent()
         intent.action = Intent.ACTION_VIEW
-        intent.data = Uri.parse(url)
+        intent.data = url.toUri()
         activity.startActivity(intent)
     }
 
@@ -168,7 +168,7 @@ class UpdateService {
      * 获取更新链接
      */
     fun getDownloadUrl(): String {
-        val api = HttpClient.getUpdateApi()
+        val api = HttpClient.updateApi
         val call = api.download(updateInfoList.first().versionCode)
         return call.request().url.toString()
     }
