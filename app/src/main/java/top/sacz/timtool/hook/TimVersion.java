@@ -7,6 +7,8 @@ public class TimVersion {
     public static final long TIM_4_0_96 = 4010;
     public static final long TIM_4_0_97 = 4011;
     public static final long TIM_4_0_98 = 4012;
+    public static final long TIM_4_0_99 = 4030;
+    public static final long TIM_4_1_0 = 4050;
 
     public static final int QQ_9_0_0 = 5282;
     public static final int QQ_9_0_15 = 5626;
