@@ -3,6 +3,7 @@ import top.sacz.buildplugin.BuildVersionConfig
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlinx.serialization)
 }
@@ -67,9 +68,7 @@ android {
 
     buildFeatures {
         viewBinding = true
-    }
-
-    buildFeatures {
+        compose = true
         buildConfig = true
     }
 }
@@ -102,6 +101,20 @@ dependencies {
 
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+
+    // Compose
+    implementation(libs.androidx.lifecycle.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel)
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.miuix.android)
+    implementation(libs.miuix.icons.android)
 
     //xposed
     compileOnly(libs.xposed.api)
