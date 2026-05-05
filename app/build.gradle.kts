@@ -3,9 +3,9 @@ import top.sacz.buildplugin.BuildVersionConfig
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.ksp)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -13,34 +13,30 @@ android {
     compileSdk = BuildVersionConfig.compileSdk
 
     defaultConfig {
-
         applicationId = BuildVersionConfig.applicationId
         minSdk = BuildVersionConfig.minSdk
         targetSdk = BuildVersionConfig.targetSdk
         versionCode = 32
         versionName = "3.2"
 
-        ndk {
-            //只支持arm64 v8a的lib so库,因为qq只支持arm64 v8a
-            abiFilters.add("arm64-v8a")
-        }
-
-        buildConfigField("String", "BUILD_GIT_VERSION", "\"${getGitVersion()}\"")
-        buildConfigField("long", "BUILD_TIMESTAMP", "${System.currentTimeMillis()}L")
+        buildConfigField("long", "BUILD_TIME", System.currentTimeMillis().toString())
 
         signingConfigs {
-            //需要在buildTypes主动引用,暂时不需要
+            // 需要在buildTypes主动引用 暂时不需要
             create("release") {
                 enableV1Signing = true
                 enableV2Signing = true
                 enableV3Signing = true
             }
         }
+
+        ndk {
+            abiFilters.add("arm64-v8a") // 只编译arm64 v8a的lib, 因为qq只支持arm64 v8a
+        }
     }
 
     buildTypes {
-
-        release {
+        getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -48,7 +44,16 @@ android {
                 "proguard-rules.pro"
             )
         }
+    }
 
+    androidResources {
+        additionalParameters.addAll(listOf("--allow-reserved-package-id", "--package-id", "0x42"))
+    }
+
+    buildFeatures {
+        buildConfig = true
+        viewBinding = true
+        compose = true
     }
 
     compileOptions {
@@ -58,49 +63,21 @@ android {
     kotlin {
         jvmToolchain(BuildVersionConfig.kotlin.toInt())
     }
-
-    androidResources {
-        additionalParameters += arrayOf(
-            "--allow-reserved-package-id",
-            "--package-id", "0x42"
-        )
-    }
-
-    buildFeatures {
-        viewBinding = true
-        compose = true
-        buildConfig = true
-    }
 }
 
-/**
- * 自定义构建好的文件名
- */
 androidComponents {
     onVariants { variant ->
         variant.outputs.forEach {
-            val output = it as? com.android.build.api.variant.impl.VariantOutputImpl
-            if (output == null) {
-                return@forEach
-            }
+            val output = it as? com.android.build.api.variant.impl.VariantOutputImpl ?: return@forEach
             output.outputFileName.set("Tim小助手_${output.versionName.get()}-${variant.buildType}.apk")
         }
     }
 }
 
-fun getGitVersion(): String {
-    return try {
-        val process = ProcessBuilder("git", "rev-parse", "--short", "HEAD").start()
-        process.inputStream.bufferedReader().use { it.readText().trim() }
-    } catch (e: Exception) {
-        "unknown"
-    }
-}
-
 dependencies {
-
-    implementation(libs.androidx.appcompat)
+    // 安卓依赖
     implementation(libs.material)
+    implementation(libs.androidx.appcompat)
 
     // Compose
     implementation(libs.androidx.lifecycle.runtime)
@@ -113,39 +90,46 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.extended)
+    // MiuiX
     implementation(libs.miuix.android)
     implementation(libs.miuix.icons.android)
 
-    //xposed
-    compileOnly(libs.xposed.api)
-
-    //注解扫描器
-    ksp(project(":annotation-scanner"))
-
-    //自己写的小工具 包含一些常用功能 反射工具 注入act res等 dexkit等
-    implementation(libs.xphelper)
-
-
+    // FastJson
+    implementation(libs.fastjson2)
+    implementation(libs.fastjson2.kotlin)
+    // 图片加载库
+    implementation(libs.glide)
+    // 键值存储库
+    implementation(libs.fastkv)
+    // 动态字节库
     implementation(libs.byte.buddy.android)
-    //常用
+    // 网络库
     implementation(libs.okhttp3)
     implementation(libs.retrofit2)
     implementation(libs.retrofit2.kotlinx.serialization)
-    implementation(libs.glide)
-    implementation(libs.fastkv)
-    implementation(libs.fastjson2)
-    implementation(libs.fastjson2.kotlin)
+    // 标准库
     implementation(libs.kotlin.stdlib)
+    // 反射库
     implementation(libs.kotlin.reflect)
+    // 适配器库
     implementation(libs.base.recyclerview.helper)
 
-    //dialogx
+    // 防撤回 ProtoBuf 解析库
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.serialization.protobuf)
+    // 动态解析 ProtoBuf
+    implementation(libs.protobuf.java)
+
+    // XpHelper
+    implementation(libs.xphelper)
+
+    // DialogX
     implementation(libs.suzhelan.dialogx)
     implementation(libs.suzhelan.dialogx.materialstyle)
 
-    //防撤回用到的proto buf解析
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.kotlinx.serialization.protobuf)
-    implementation(libs.protobuf.java)
+    // 注解处理器
+    ksp(project(":annotation-scanner"))
 
+    // Xposed Api
+    compileOnly(libs.xposed.api)
 }

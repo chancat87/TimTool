@@ -5,7 +5,6 @@ import com.kongzue.dialogx.dialogs.PopTip
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import top.sacz.timtool.R
 import top.sacz.timtool.net.HttpClient
 import top.sacz.timtool.net.entity.QSResult
 import top.sacz.timtool.net.entity.UpdateInfo
@@ -20,9 +19,9 @@ class UpdateLogDialog {
 
     fun show() {
         val dialog = MessageDialog.build()
-            .setTitle(R.string.view_update_log)
-            .setMessage(R.string.loading)
-            .setOkButton(R.string.ok)
+            .setTitle("历史更新日志")
+            .setMessage("加载中")
+            .setOkButton("确认")
             .show()
         asyncGetUpdateLog(dialog)
     }

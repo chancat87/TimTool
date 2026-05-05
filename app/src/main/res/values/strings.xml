@@ -1,21 +1,9 @@
 <resources>
+    <string name="module_name">Tim小助手</string>
 
-    <string name="app_name">Tim小助手</string>
-    <string name="simple_desc">Tim功能性Xposed模块</string>
 
     <string name="setting_message">模块版本:%s %s版本:%s</string>
 
-    <string name="build_info">
-        构建版本：%s\n
-        构建时间：%s\n
-    </string>
-
-    <string name="telegram">Telegram</string>
-
-    <string name="github">Github</string>
-
-    <string name="ok">确认</string>
-    <string name="loading">加载中...</string>
     <string name="update_toast">[Tim小助手]有新版本</string>
     <string name="update_title">有新更新 v</string>
     <string name="to_update">去更新</string>
@@ -30,10 +18,7 @@
 
     <string name="time_format">时间格式</string>
     <string name="time_size">大小(dp)</string>
-    <string name="view_update_log">更新日志</string>
 
-    <string name="help">使用教程</string>
-    <string name="hide_icon">隐藏桌面图标</string>
 
     <string name="me_daytime_bubble">自己-常规模式</string>
     <string name="me_dark_bubble">自己-深色模式</string>

@@ -2,39 +2,29 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!--网络请求权限-->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
     <application
         android:name=".app.FixApplication"
         android:icon="@mipmap/ic_launcher_round"
-        android:label="@string/app_name"
+        android:label="@string/module_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TimTool"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
         <activity
-            android:name=".app.activity.MainActivity"
+            android:name=".app.activity.NewMainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="de.robv.android.xposed.category.MODULE_SETTINGS" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity-alias
-            android:name=".app.activity.HideMainActivity"
-            android:exported="true"
-            android:targetActivity=".app.activity.MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="de.robv.android.xposed.category.MODULE_SETTINGS" />
-            </intent-filter>
-        </activity-alias>
-
-        <!-- Xposed模块配置 -->
         <meta-data
             android:name="xposedmodule"
             android:value="true" />
@@ -43,10 +33,7 @@
             android:value="Tim模块 QStory续作 开源免费仅供学习 请勿进行商业行为" />
         <meta-data
             android:name="xposedminversion"
-            android:value="93" />
-        <meta-data
-            android:name="xposedsharedprefs"
-            android:value="true" />
+            android:value="83" />
         <meta-data
             android:name="xposedscope"
             android:resource="@array/xposed_scope" />

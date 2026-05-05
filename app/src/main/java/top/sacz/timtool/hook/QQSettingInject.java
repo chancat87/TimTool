@@ -57,7 +57,7 @@ public class QQSettingInject extends BaseHookItem {
                 //获取itemList的首个元素并取得Class
                 Class<?> itemClass = itemList.get(0).getClass();
                 //新建自己的Item
-                Object mItem = ConstructorUtils.newInstance(itemClass, new Class[]{Context.class, int.class, CharSequence.class, int.class}, context, 0x520a, context.getString(R.string.app_name), R.mipmap.ic_launcher_round);
+                Object mItem = ConstructorUtils.newInstance(itemClass, new Class[]{Context.class, int.class, CharSequence.class, int.class}, context, 0x520a, context.getString(R.string.module_name), R.mipmap.ic_launcher_round);
                 //在这个类查找所有符合 public void ?(Function0 function0)的方法 可以查找到两个 一个是点击事件 一个是item刚被初始化时的事件
                 List<Method> setOnClickMethods = MethodUtils.create(itemClass)
                         .returnType(void.class)

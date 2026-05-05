@@ -3,10 +3,6 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.ksp)
+    implementation(libs.ksp.symbol.processing)
     implementation(libs.kotlinpoet.ksp)
 }
-
-
-
-

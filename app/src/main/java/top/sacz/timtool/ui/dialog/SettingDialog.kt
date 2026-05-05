@@ -47,7 +47,7 @@ class SettingDialog {
             .format(BuildConfig.VERSION_NAME, HookEnv.getAppName(), HookEnv.getVersionName())
         dialog = MessageDialog.build()
             .setTitleIcon(R.drawable.ic_github)
-            .setTitle(R.string.app_name)
+            .setTitle(R.string.module_name)
             .setCustomView(object : OnBindView<MessageDialog>(R.layout.layout_setting) {
                 override fun onBind(
                     p0: MessageDialog,
